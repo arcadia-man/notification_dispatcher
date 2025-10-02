@@ -1,137 +1,133 @@
-# **🔔 Notification Dispatcher (Rule-Based)**
+# 🚀 Notification Dispatcher (TypeScript)
+
+A **scalable, rule-driven notification system** built with **TypeScript + Node.js**.
+It supports **batch processing, retries, quiet hours, and channel-specific formatting** to simulate real-world notification workflows.
+
+This project demonstrates **system design, clean architecture, and fault-tolerant communication systems**.
 
 ---
 
-## **Objective**
+## 📌 Features
 
-Design and implement a lightweight **Notification Dispatcher** that processes incoming events and routes them to users through different notification channels (e.g., email, SMS, Slack), based on user preferences and simple rules.
+✅ **Batch Processing** – Queue multiple events and process them at configurable intervals.
+✅ **Retry with Exponential Backoff** – Ensures reliable delivery with 3 retry attempts.
+✅ **Quiet Hours & Scheduling** – Avoid disturbing users during off-hours, auto-reschedule delivery.
+✅ **Channel-Specific Formatting** – Custom formatting for Email, SMS, and Slack.
+✅ **Rule Engine Integration** – Define dynamic rules like:
 
-This problem is designed to assess your ability to:
-
-* Abstract interfaces and business logic  
-* Apply clean separation of concerns  
-* Structure code for modularity and future extensibility  
-* Handle practical concerns like retries, observability, and testing
-
-You may use any language or framework you prefer. Focus on delivering maintainable, testable, production-grade code.
-
----
-
-## **Problem Statement**
-
-You're tasked with building a minimal service that can:
-
-* Accept **event data** (e.g., user actions, system alerts)  
-* Evaluate **notification rules** for each event and user  
-* Dispatch notifications through available **channels**  
-* Provide logs or metrics on what was sent and when
+* Notify only during business hours
+* Notify if order amount > $100
+  ✅ **Metrics Tracking** – Logs events, success/failure counts, retries per channel.
 
 ---
 
-## **Core Requirements**
+## 📂 Project Structure
 
-Your service should support:
-
-### **1\. Event Ingestion**
-
-* Accept incoming events, which contain:
-
-  * An `event_type` (e.g., `"order_placed"`, `"system_alert"`)  
-  * A `user_id`  
-  * An optional payload with metadata (e.g., order ID, error message)
-
-### **2\. User Notification Preferences**
-
-* Maintain per-user notification preferences (can be hardcoded or mocked)
-
-  * For each `event_type`, which **channels** to notify through (e.g., `email`, `sms`, `slack`)  
-  * Optional: whether the user wants to be notified at all
-
-### **3\. Dispatch Logic**
-
-* Based on preferences and event type, notify the user via relevant channels  
-* Each channel should be implemented as a pluggable interface/class  
-* Simulate channel delivery (e.g., print to console or append to a file)
-
-### **4\. Retry Handling**
-
-* Simulate failure in one or more channels  
-* Implement a **retry mechanism** with exponential backoff or a simple retry count
+```
+notification_dispatcher/
+├── channels/             # Channel implementations (Email, SMS, Slack)
+├── constants/            # Constants & enums
+├── interfaces/           # Event & User interfaces
+├── lib/                  # Core NotificationDispatcher
+├── services/             # UserService, RuleEngineService, MetricTracker, EventHandler
+├── utils/                # Time & user helpers
+├── tests/                # Jest test cases
+├── index.ts              # Entry point
+└── README.md             # Project documentation
+```
 
 ---
 
-## **Optional Enhancements**
+## ⚙️ Tech Stack
 
-You may choose to implement any of the following, though they are **not required**:
-
-* Support for **batch processing** of events  
-* Scheduled delivery or **"quiet hours"** for certain channels  
-* Channel-specific formatting (e.g., pretty messages for Slack)  
-* Rule engine to allow conditions like:  
-  * “Notify on system\_alerts only during business hours”  
-  * “Notify only if order amount \> $100”
+* **Language:** TypeScript
+* **Runtime:** Node.js (v20.x)
+* **Testing:** Jest
+* **Architecture:** Event-driven, modular services
 
 ---
 
-## **Non-Functional Requirements**
+## ▶️ Getting Started
 
-### **✅ Testability**
+### 1. Clone Repository
 
-* Include unit tests for:  
-  * Preference evaluation  
-  * Channel dispatch logic  
-  * Retry mechanisms
+```bash
+git clone https://github.com/arcadia-man/notification_dispatcher.git
+cd notification_dispatcher
+```
 
-### **🔍 Observability**
+### 2. Install Dependencies
 
-* Log each dispatch attempt (success/failure)  
-* Track metrics like:  
-  * Events received  
-  * Notifications sent per channel  
-  * Failures and retries
+```bash
+npm install
+```
 
-### **🔌 Extensibility**
+### 3. Run Tests
 
-* Adding a new notification channel should not require rewriting existing logic  
-* Future support for different event sources or formats should be straightforward
+```bash
+npm run test
+```
 
----
+### 4. Start Application
 
-## **Deliverables**
-
-You should submit:
-
-* Source code (GitHub or zip)  
-* A README with:  
-  * How to run the service  
-  * Sample event inputs and outputs  
-  * Assumptions and design tradeoffs
-
-* Basic tests (unit or integration)
+```bash
+npm run start
+```
 
 ---
 
-## **Time Expectation**
+## 🖥️ Example Output
 
-This assignment should take **about one day** of focused engineering effort.
+```bash
+Queueing message for ravi@example.com via email
+Queueing message for U1001 via slack
+...
+Sending EMAIL to ravi@example.com: 'Hello Ravi, here is your orderPlaced info: {...}'
+Successfully sent notification to ravi@example.com via email.
+Sending SLACK message to U1001: 'Hey Ravi, check your orderPlaced details: {...}'
+Retrying in 1.0 seconds...
+Successfully sent notification to U1001 via slack.
+
+----- Notification Metrics -----
+Total Events Received: 5
+Notifications Sent (by Channel):
+  - email: 2
+  - slack: 1
+  - sms: 1
+Total Failures: 2
+Total Retries: 3
+--------------------------------
+```
 
 ---
 
-## **Evaluation Criteria**
+## 📊 System Design Overview
 
-| Area | What We Look For |
-| ----- | ----- |
-| Design | Clear abstractions, extensibility, separation of concerns |
-| Code Quality | Modular, idiomatic, readable |
-| Test Coverage | Logical tests for key functionality |
-| Observability | Logging and metrics for real-world use |
-| Pragmatism | Balanced design and realistic tradeoffs |
-| Documentation | Setup, usage, and rationale are clear |
+**Flow: (src/index.js starts simulation)**
+
+1. **EventHandlerService** receives an event.
+2. **RuleEngineService** validates event against rules.
+3. **NotificationDispatcher** queues message with correct trigger (immediate/scheduled).
+4. **Dispatcher** sends via channel (Email/SMS/Slack) with retries + backoff.
+5. **MetricTracker** logs delivery stats.
 
 ---
 
-Feel free to reach out if you have any questions during the assignment. We’re looking forward to seeing your approach\!
+## 🔮 Future Enhancements
 
-# Solution
+* Add Kafka/RabbitMQ for distributed queueing.
+* Support push notifications & WhatsApp channels.
+* Store events & metrics in database for analytics.
+* Provide admin dashboard for monitoring.
 
-1. I need to create a typescript server
+---
+
+
+👤 **Pritam Kumar Maurya**
+💼 [LinkedIn](https://www.linkedin.com/in/pritam-m-9b81b3371/)
+
+---
+
+🔥 This project is a **showcase of clean TypeScript code, event-driven design, and real-world notification handling**.
+
+---

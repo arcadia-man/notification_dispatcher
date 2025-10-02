@@ -12,6 +12,7 @@ export class MetricTracker {
     incrementRetry = () => this.retries++;
 
     display() {
+        let success = 0;
         console.log("\n----- Notification Metrics -----");
         console.log(`Total Events Received: ${this.eventsReceived}`);
         console.log("Notifications Sent (by Channel):");
@@ -19,11 +20,14 @@ export class MetricTracker {
             console.log("  - None");
         } else {
             for (const [channel, count] of Object.entries(this.notificationsSent)) {
+                success += count;
                 console.log(`  - ${channel}: ${count}`);
             }
         }
         console.log(`Total Failures: ${this.failures}`);
         console.log(`Total Retries: ${this.retries}`);
+        console.log(`Total Success: ${success}`);
+        console.log(`Parmanent Failures: ${this.failures - this.retries}`);
         console.log("--------------------------------");
     }
 }
